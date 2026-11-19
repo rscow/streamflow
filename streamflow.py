@@ -39,21 +39,24 @@ def plot_streamflow(dates, flows, sites):
 def summarize(dates, flows, sites):
     with open("streamflow_summary.csv", "w") as f:
         f.write("Streamflow Summary:\n")
-        f.write(f'Gauge\t\tMax (cfs)\tDate of Max\t\t\t\tMin (cfs)\t\tMean (cfs)\n')
+        f.write("Gauge,Max (cfs),Date of Max,Min (cfs),Mean (cfs)\n")
         for i in range(len(sites)):
             site_flows = flows[i]
             mean_flow = np.mean(site_flows)
             max_flow = np.max(site_flows)
             min_flow = np.min(site_flows)
-            f.write(f"{sites[i]}\t{max_flow:.2f}\t\t{dates[np.argmax(site_flows)]}\t\t{min_flow:.2f}\t\t\t{mean_flow:.2f}\n")
+            date_of_max = np.datetime_as_string(dates[np.argmax(site_flows)], unit="s")
+            f.write(f"{sites[i]},{max_flow:.2f},{date_of_max},{min_flow:.2f},{mean_flow:.2f}\n")
+
     print("Streamflow Summary:")
-    print(f'Gauge\t\tMax (cfs)\tDate of Max\t\tMin (cfs)\tMean (cfs)')
+    print(f"{'Gauge':<10} {'Max (cfs)':>10} {'Date of Max':<22} {'Min (cfs)':>10} {'Mean (cfs)':>10}")
     for i in range(len(sites)):
         site_flows = flows[i]
         mean_flow = np.mean(site_flows)
         max_flow = np.max(site_flows)
         min_flow = np.min(site_flows)
-        print(f"{sites[i]}\t{max_flow:.2f}\t\t{dates[np.argmax(site_flows)]}\t{min_flow:.2f}\t\t{mean_flow:.2f}")
+        date_of_max = np.datetime_as_string(dates[np.argmax(site_flows)], unit="s")
+        print(f"{sites[i]:<10} {max_flow:10.2f} {date_of_max:<22} {min_flow:10.2f} {mean_flow:10.2f}")
 
 #this function was written by AI 
 #this function reports the number of hours each site has exceeded a given flow threshold.
@@ -66,9 +69,17 @@ def report_hours_above_threshold(flows, sites):
             print("Please enter a numeric threshold.")
 
     print(f"\nHours with flow above {threshold:.2f} cfs:")
-    for i, site_flows in enumerate(flows): #enumerate is a built-in function that returns both the index and the value of items in flows.
-        hours_above = np.count_nonzero(site_flows > threshold) * 0.25 #each flow measurement is 0.25 hours
-        print(f"{sites[i]}: {hours_above:.2f} hours")
+    print(f"{'Gauge':<10} {'Hours above threshold':>24}")
+
+    with open("streamflow_summary.csv", "a") as f:
+        f.write("\n")
+        f.write(f"Hours above {threshold:.2f} cfs\n")
+        f.write("Gauge,Hours above threshold\n")
+
+        for i, site_flows in enumerate(flows): #enumerate is a built-in function that returns both the index and the value of items in flows.
+            hours_above = np.count_nonzero(site_flows > threshold) * 0.25 #each flow measurement is 0.25 hours
+            print(f"{sites[i]:<10} {hours_above:24.2f}")
+            f.write(f"{sites[i]},{hours_above:.2f}\n")
         
 
 sites = ["10163000", "10155200", "10155500", "10154200", "10155000"]
