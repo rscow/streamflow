@@ -54,9 +54,25 @@ def summarize(dates, flows, sites):
         max_flow = np.max(site_flows)
         min_flow = np.min(site_flows)
         print(f"{sites[i]}\t{max_flow:.2f}\t\t{dates[np.argmax(site_flows)]}\t{min_flow:.2f}\t\t{mean_flow:.2f}")
+
+#this function was written by AI 
+#this function reports the number of hours each site has exceeded a given flow threshold.
+def report_hours_above_threshold(flows, sites):
+    while True:
+        try: #try is a control flow statement that ensures the user input is valid. If it's not, the block starts over.
+            threshold = float(input("Enter a flow threshold in cfs: "))
+            break
+        except ValueError:
+            print("Please enter a numeric threshold.")
+
+    print(f"\nHours with flow above {threshold:.2f} cfs:")
+    for i, site_flows in enumerate(flows): #enumerate is a built-in function that returns both the index and the value of items in flows.
+        hours_above = np.count_nonzero(site_flows > threshold) * 0.25 #each flow measurement is 0.25 hours
+        print(f"{sites[i]}: {hours_above:.2f} hours")
         
 
 sites = ["10163000", "10155200", "10155500", "10154200", "10155000"]
 dates, flows = load_streamflow("June-2021-Provo-River-Streamflow-Rates.csv")
 plot_streamflow(dates, flows, sites)
 summarize(dates, flows, sites)
+report_hours_above_threshold(flows, sites)
